@@ -1,7 +1,7 @@
 let selectedColor = "gray";
 let selectedWristSize = "S";
 let seletedQuantity;
-let price;
+let price = 99;
 const title = productTitle.innerText;
 let totalPrice = 0;
 
@@ -47,39 +47,42 @@ quantityBtns.forEach((button) => {
   });
 });
 
-let cartItems = localStorage.getItem("cart-items") || [];
+let cartItems = JSON.parse(localStorage.getItem("cart-items")) || [];
+console.log(cartItems);
+
 addToCart.addEventListener("click", function () {
   const convertedQuantity = parseInt(quantity.innerText);
-  const currentCartCount = parseInt(cartCount.innerText);
+  const currentCartCount = cartItems.length;
 
-  const newCount = currentCartCount + convertedQuantity;
-  cartCount.innerText = newCount;
+  // const newCount = currentCartCount + convertedQuantity;
+  cartCount.innerText = currentCartCount;
   if (convertedQuantity > 0) {
     removeClass(checkOutContainer, "hidden");
-    JSON.stringify(
-      cartItems.push({
-        img: "./images/" + selectedColor + ".png",
-        title: title,
-        size: selectedWristSize,
-        color: selectedColor,
-        quantity: seletedQuantity,
-        price: price * convertedQuantity,
-      })
-    );
+
+    cartItems.push({
+      img: "./images/" + selectedColor + ".png",
+      title: title,
+      size: selectedWristSize,
+      color: selectedColor,
+      quantity: seletedQuantity,
+      price: price * convertedQuantity,
+    });
     localStorage.setItem("cart-items", JSON.stringify(cartItems));
   } else {
     alert("pleasae add some quantity");
   }
+  createDynamicCartList();
 });
 
 checkOutBtn.addEventListener("click", () => {
   removeClass(cartModal, "hidden");
 });
+
 function createDynamicCartList() {
-  const row = document.createElement("tr");
+  cartItemsContainer.innerHTML = "";
   // console.log(typeof cartItems);
-  const localCartItems = JSON.parse(cartItems);
-  localCartItems.map((item) => {
+  cartItems.map((item) => {
+    const row = document.createElement("tr");
     row.classList.add("border-b");
     row.innerHTML = `
       <td class="py-2 px-4">
@@ -93,12 +96,12 @@ function createDynamicCartList() {
     <td class="py-2 px-4">${item.quantity}</td>
     <td class="py-2 px-4">$${item.price}</td>
     `;
+    cartItemsContainer.appendChild(row);
   });
-  // cartItems.forEach((item) => {});
-  cartItemsContainer.appendChild(row);
 }
 
 continueBtn.addEventListener("click", function () {
   addClass(cartModal, "hidden");
 });
 window.addEventListener("load", createDynamicCartList);
+// console.log(JSON.stringify(localStorage));
